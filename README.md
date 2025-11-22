@@ -13,7 +13,7 @@ A beautiful cross-platform recipe management application built with Next.js, Rea
 
 ## Technology Stack
 
-- **Framework**: Next.js 14+ (App Router)
+- **Framework**: Next.js 16+ (App Router)
 - **Frontend**: React, TypeScript
 - **UI Libraries**: Chakra UI, Tailwind CSS, shadcn/ui
 - **Database**: PostgreSQL (Azure + local Docker)
