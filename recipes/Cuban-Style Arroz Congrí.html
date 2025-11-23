@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            /* Shared styles */
+            body {
+                font-family: Helvetica, sans-serif;
+                font-size: 16px;
+                color: #34302e;
+                margin: 0.25in;
+            }
+            @page {
+                size: letter portrait;
+                margin: 0.25in;
+            }
+            .name {
+                font-size: 18px;
+                font-family: Helvetica, sans-serif;
+                font-weight: normal;
+                margin: 0 0 10px 0;
+            }
+            .categories {
+                color: #605D5D;
+                font-size: 14px;
+                font-family: Helvetica, sans-serif;
+                font-style: italic;
+            }
+            .rating {
+                color: #d10505;
+                font-size: 14px;
+            }
+            .metadata {
+                font-size: 14px;
+            }
+            .infobox p {
+                margin: 0;
+                line-height: 150%;
+            }
+            .subhead {
+                color: #d10505;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin: 10px 0;
+            }
+            
+            .ingredients p {
+                margin: 4px 0;
+            }
+            /* To prevent nutrition/directions from getting too close
+               to ingredients */
+            .ingredients {
+                padding-bottom: 10px;
+            }
+            .clear {
+                clear:both;
+            }
+            a {
+                color: #4990E2;
+                text-decoration: none;
+            }
+            /* Full page specific styles */
+            .text {
+                line-height: 130%;
+            }
+            .photobox {
+                float: left;
+                margin-right: 14px;
+                            }
+            .photo {
+                max-width: 140px;
+                max-height: 140px;
+                width: auto;
+                height: auto;
+            }
+            .inline-image {
+                max-width: 25%;
+                max-height: 25%;
+                width: auto;
+                height: auto;
+            }
+            .photoswipe {
+                border: 1px #dddddd solid;
+                cursor: pointer;
+            }
+            .pswp__caption__center {
+                text-align: center !important;
+            }
+            .recipe {
+                page-break-after: always;
+                            }
+            .recipe:first-child {
+                border-top: 0 none;
+                margin-top: 0;
+                padding-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Recipe -->
+<div class="recipe" itemscope itemtype="http://schema.org/Recipe" >
+    
+    <div class="infobox">
+
+        <!-- Image -->
+        <div class="photobox">
+            <a href="https://static01.nyt.com/images/2016/05/18/dining/18JPCUBA3/18JPCUBA3-articleLarge.jpg">
+                <img src="Images/B1B287AD-9908-437C-A6BA-FC803CC94347/6130C6FA-9A60-4562-BF1B-78221BD4547F.jpg" itemprop="image" class="photo photoswipe"/>
+            </a>
+                    </div>
+
+        <!-- Name -->
+        <h1 itemprop="name" class="name">Cuban-Style Arroz Congr&#237;</h1>
+        
+        <!-- Info -->
+        
+        <!-- Rating, categories -->
+        <p itemprop="aggregateRating" class="rating" value="5">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+            <p itemprop="recipeCategory" class="categories">Beans, Cuban</p>
+        
+        <p class="metadata">
+        
+            <!-- Cook time, prep time, servings, difficulty -->
+            <b>Cook Time: </b><span itemprop="">1 1/2 to 2 1/2 hours</span>
+            <b>Servings: </b><span itemprop="">Yield 6 to 8 servings</span>
+
+            <!-- Source -->
+                <b>Source: </b>
+                    <a itemprop="url" href="https://cooking.nytimes.com/recipes/1018115-cuban-style-arroz-congri">
+                        <span itemprop="author">Cooking.nytimes.com</span>
+                    </a>
+                            
+        </p>
+        
+        <div class="clear"></div>
+
+    </div>
+    
+    <div class="left-column">
+
+        <!-- Ingredients -->
+        <div class="ingredientsbox">
+            <h3 class="subhead">Ingredients</h3>
+            <div class="ingredients text">
+                <p class="line" itemprop="recipeIngredient"><strong>1</strong> cup dried black beans</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> tablespoons olive oil</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> small onion, chopped into 1/2-inch pieces</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> small green pepper, chopped into 1/2-inch pieces</p><p class="line" itemprop="recipeIngredient"><strong>5 or 6</strong> cloves garlic, roughly chopped</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> teaspoon kosher salt</p><p class="line" itemprop="recipeIngredient">Freshly ground pepper</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tablespoon fresh oregano, roughly chopped</p><p class="line" itemprop="recipeIngredient"><strong>¼</strong> teaspoon dried dill</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> small bay leaves</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tablespoon cider vinegar</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tablespoon dry red wine, or vino seco</p><p class="line" itemprop="recipeIngredient"><strong>1 ½</strong> cups long-grain rice, rinsed</p>
+            </div>
+        </div>
+        
+        <!-- Nutrition (in two-column mode it goes below the ingredients) -->
+
+    </div>
+    
+    <div class="right-column">
+    
+    <!-- Description -->
+
+    <!-- Directions -->
+    <div class="directionsbox">
+        <h3 class="subhead">Directions</h3>
+        <div itemprop="recipeInstructions" class="directions text">
+            <p class="line">Rinse the beans and pick them over for any small stones. Put the beans and 8 cups water in a medium-size pot. Bring to a boil, then reduce to a low simmer, partly cover and cook until tender, about 1 to 2 hours. (Time will vary depending on the bean.)</p><p class="line">Meanwhile, make the sofrito: Put the oil in a medium-size pot (large enough to hold the rice as well) over medium heat. When it’s hot, add the onion, green pepper and garlic. Add a pinch of salt and several grinds of pepper. Sauté until the vegetables are limp. Stir in the oregano, dill and bay leaves and remove from heat.</p><p class="line">Drain the beans, reserving the broth and being careful to not break the beans. In a large measuring cup, add the vinegar and wine, 1 cup of the reserved bean broth and enough water for all the liquid to measure 2 1/4 cups.</p><p class="line">Put the sofrito back on medium heat, add the rice and stir to combine. Cook the rice for 1 to 2 minutes, then add the seasoned bean broth/water mixture and the salt. Bring to a boil, stir, then reduce to a simmer, cover and cook for 17 minutes. Remove from heat, fluff with a fork and return cover to pot for 10 minutes.</p><p class="line">Remove bay leaves and put rice mixture into a mixing bowl. Gently mix in the beans, being careful not to break them. Season well with salt and pepper and transfer to a serving bowl. Serve hot.</p>
+        </div>
+    </div>
+
+    <!-- Notes -->
+
+
+    <!-- Nutrition (in regular mode it goes below the notes) -->
+        <!-- Used in two different places depending on the recipe layout -->
+
+    
+    </div>
+    
+    <div class="clear"></div>
+
+</div>
+
+
+
+    </body>
+</html>

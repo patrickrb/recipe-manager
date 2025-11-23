@@ -14,38 +14,150 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
   const [formData, setFormData] = useState<RecipeFormData>({
     title: '',
     description: '',
+    image: '',
     ingredients: [],
     instructions: [],
     categories: [],
     notes: '',
+    sourceUrl: '',
+    sourceAuthor: '',
+    prepTime: '',
+    cookTime: '',
+    totalTime: '',
+    servings: '',
+    difficulty: '',
+    calories: undefined,
+    protein: undefined,
+    carbs: undefined,
+    fat: undefined,
+    fiber: undefined,
+    sugar: undefined,
+    sodium: undefined,
   });
   
   const [currentIngredient, setCurrentIngredient] = useState('');
   const [currentInstruction, setCurrentInstruction] = useState('');
   const [currentCategory, setCurrentCategory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (recipe) {
       setFormData({
         title: recipe.title,
         description: recipe.description || '',
+        image: recipe.image || '',
         ingredients: recipe.ingredients,
         instructions: recipe.instructions,
         categories: recipe.categories,
         notes: recipe.notes || '',
+        sourceUrl: recipe.sourceUrl || '',
+        sourceAuthor: recipe.sourceAuthor || '',
+        prepTime: recipe.prepTime || '',
+        cookTime: recipe.cookTime || '',
+        totalTime: recipe.totalTime || '',
+        servings: recipe.servings || '',
+        difficulty: recipe.difficulty || '',
+        calories: recipe.calories || undefined,
+        protein: recipe.protein || undefined,
+        carbs: recipe.carbs || undefined,
+        fat: recipe.fat || undefined,
+        fiber: recipe.fiber || undefined,
+        sugar: recipe.sugar || undefined,
+        sodium: recipe.sodium || undefined,
       });
+      setImagePreview(recipe.image || '');
+      setImageFile(null);
     } else {
       setFormData({
         title: '',
         description: '',
+        image: '',
         ingredients: [],
         instructions: [],
         categories: [],
         notes: '',
+        sourceUrl: '',
+        sourceAuthor: '',
+        prepTime: '',
+        cookTime: '',
+        totalTime: '',
+        servings: '',
+        difficulty: '',
+        calories: undefined,
+        protein: undefined,
+        carbs: undefined,
+        fat: undefined,
+        fiber: undefined,
+        sugar: undefined,
+        sodium: undefined,
       });
+      setImagePreview('');
+      setImageFile(null);
     }
   }, [recipe, isOpen]);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB');
+      return;
+    }
+
+    setImageFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleImageUpload = async () => {
+    if (!imageFile) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', imageFile);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      setFormData(prev => ({ ...prev, image: data.url }));
+      setImageFile(null);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    setFormData(prev => ({ ...prev, image: '' }));
+  };
 
   const handleAddItem = (
     value: string,
@@ -75,12 +187,32 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
     e.preventDefault();
     setIsLoading(true);
     try {
-      await onSave(formData);
+      // Upload image if there's a file that hasn't been uploaded yet
+      let imageUrl = formData.image;
+      if (imageFile && !formData.image) {
+        setIsUploading(true);
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', imageFile);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          imageUrl = data.url;
+        }
+        setIsUploading(false);
+      }
+
+      await onSave({ ...formData, image: imageUrl });
       onClose();
     } catch (error) {
       console.error('Error saving recipe:', error);
     } finally {
       setIsLoading(false);
+      setIsUploading(false);
     }
   };
 
@@ -113,7 +245,7 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               placeholder="Recipe name"
               required
             />
@@ -126,10 +258,138 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               placeholder="Brief description of the recipe"
               rows={3}
             />
+          </div>
+
+          {/* Recipe Details */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Prep Time
+              </label>
+              <input
+                type="text"
+                value={formData.prepTime}
+                onChange={(e) => setFormData({ ...formData, prepTime: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                placeholder="e.g., 15 min"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Cook Time
+              </label>
+              <input
+                type="text"
+                value={formData.cookTime}
+                onChange={(e) => setFormData({ ...formData, cookTime: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                placeholder="e.g., 30 min"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Total Time
+              </label>
+              <input
+                type="text"
+                value={formData.totalTime}
+                onChange={(e) => setFormData({ ...formData, totalTime: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                placeholder="e.g., 45 min"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Servings
+              </label>
+              <input
+                type="text"
+                value={formData.servings}
+                onChange={(e) => setFormData({ ...formData, servings: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                placeholder="e.g., 4 servings"
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Difficulty
+              </label>
+              <select
+                value={formData.difficulty}
+                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              >
+                <option value="">Select difficulty</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Recipe Image
+            </label>
+
+            {imagePreview ? (
+              <div className="space-y-3">
+                <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-300">
+                  <img
+                    src={imagePreview}
+                    alt="Recipe preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm"
+                  >
+                    Remove Image
+                  </button>
+                  {imageFile && !formData.image && (
+                    <button
+                      type="button"
+                      onClick={handleImageUpload}
+                      disabled={isUploading}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm"
+                    >
+                      {isUploading ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg className="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="mb-2 text-sm text-gray-500">
+                      <span className="font-semibold">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                  </div>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </label>
+              </div>
+            )}
           </div>
 
           <div>
@@ -147,7 +407,7 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
                     handleAddItem(currentCategory, setCurrentCategory, 'categories');
                   }
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 placeholder="Add category (e.g., Dinner, Dessert)"
               />
               <button
@@ -194,7 +454,7 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
                     handleAddItem(currentIngredient, setCurrentIngredient, 'ingredients');
                   }
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 placeholder="Add ingredient"
               />
               <button
@@ -241,7 +501,7 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
                     handleAddItem(currentInstruction, setCurrentInstruction, 'instructions');
                   }
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 placeholder="Add instruction step (Ctrl+Enter to add)"
                 rows={2}
               />
@@ -282,10 +542,139 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               placeholder="Additional notes or tips"
               rows={3}
             />
+          </div>
+
+          {/* Nutrition Information */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Nutrition Information</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Calories
+                </label>
+                <input
+                  type="number"
+                  value={formData.calories || ''}
+                  onChange={(e) => setFormData({ ...formData, calories: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="kcal"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Protein (g)
+                </label>
+                <input
+                  type="number"
+                  value={formData.protein || ''}
+                  onChange={(e) => setFormData({ ...formData, protein: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="grams"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Carbs (g)
+                </label>
+                <input
+                  type="number"
+                  value={formData.carbs || ''}
+                  onChange={(e) => setFormData({ ...formData, carbs: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="grams"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fat (g)
+                </label>
+                <input
+                  type="number"
+                  value={formData.fat || ''}
+                  onChange={(e) => setFormData({ ...formData, fat: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="grams"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fiber (g)
+                </label>
+                <input
+                  type="number"
+                  value={formData.fiber || ''}
+                  onChange={(e) => setFormData({ ...formData, fiber: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="grams"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sugar (g)
+                </label>
+                <input
+                  type="number"
+                  value={formData.sugar || ''}
+                  onChange={(e) => setFormData({ ...formData, sugar: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="grams"
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sodium (mg)
+                </label>
+                <input
+                  type="number"
+                  value={formData.sodium || ''}
+                  onChange={(e) => setFormData({ ...formData, sodium: e.target.value ? parseInt(e.target.value) : undefined })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="milligrams"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Source Information */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Source Information</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Source URL
+                </label>
+                <input
+                  type="url"
+                  value={formData.sourceUrl}
+                  onChange={(e) => setFormData({ ...formData, sourceUrl: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="https://example.com/recipe"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Source Author
+                </label>
+                <input
+                  type="text"
+                  value={formData.sourceAuthor}
+                  onChange={(e) => setFormData({ ...formData, sourceAuthor: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  placeholder="Author or website name"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
@@ -298,10 +687,10 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
             </button>
             <button
               type="submit"
-              disabled={!formData.title.trim() || isLoading}
+              disabled={!formData.title.trim() || isLoading || isUploading}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Saving...' : recipe ? 'Update' : 'Create'}
+              {isUploading ? 'Uploading...' : isLoading ? 'Saving...' : recipe ? 'Update' : 'Create'}
             </button>
           </div>
         </form>

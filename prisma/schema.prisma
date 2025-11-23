@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,15 +7,36 @@ datasource db {
 }
 
 model Recipe {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  ingredients String[] // Array of ingredient strings
-  instructions String[] // Array of instruction steps
-  categories  String[] // Array of category tags
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  ingredients  String[]
+  instructions String[]
+  categories   String[]
+  notes        String?
+  rating       Int?     @default(0)
+  sourceUrl    String?
+  sourceAuthor String?
+
+  // Recipe metadata
+  prepTime     String?
+  cookTime     String?
+  totalTime    String?
+  servings     String?
+  difficulty   String?
+
+  // Nutrition information
+  calories     Int?
+  protein      Int?     // in grams
+  carbs        Int?     // in grams
+  fat          Int?     // in grams
+  fiber        Int?     // in grams
+  sugar        Int?     // in grams
+  sodium       Int?     // in milligrams
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  image        String?
 
   @@map("recipes")
 }

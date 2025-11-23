@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            /* Shared styles */
+            body {
+                font-family: Helvetica, sans-serif;
+                font-size: 16px;
+                color: #34302e;
+                margin: 0.25in;
+            }
+            @page {
+                size: letter portrait;
+                margin: 0.25in;
+            }
+            .name {
+                font-size: 18px;
+                font-family: Helvetica, sans-serif;
+                font-weight: normal;
+                margin: 0 0 10px 0;
+            }
+            .categories {
+                color: #605D5D;
+                font-size: 14px;
+                font-family: Helvetica, sans-serif;
+                font-style: italic;
+            }
+            .rating {
+                color: #d10505;
+                font-size: 14px;
+            }
+            .metadata {
+                font-size: 14px;
+            }
+            .infobox p {
+                margin: 0;
+                line-height: 150%;
+            }
+            .subhead {
+                color: #d10505;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin: 10px 0;
+            }
+            
+            .ingredients p {
+                margin: 4px 0;
+            }
+            /* To prevent nutrition/directions from getting too close
+               to ingredients */
+            .ingredients {
+                padding-bottom: 10px;
+            }
+            .clear {
+                clear:both;
+            }
+            a {
+                color: #4990E2;
+                text-decoration: none;
+            }
+            /* Full page specific styles */
+            .text {
+                line-height: 130%;
+            }
+            .photobox {
+                float: left;
+                margin-right: 14px;
+                            }
+            .photo {
+                max-width: 140px;
+                max-height: 140px;
+                width: auto;
+                height: auto;
+            }
+            .inline-image {
+                max-width: 25%;
+                max-height: 25%;
+                width: auto;
+                height: auto;
+            }
+            .photoswipe {
+                border: 1px #dddddd solid;
+                cursor: pointer;
+            }
+            .pswp__caption__center {
+                text-align: center !important;
+            }
+            .recipe {
+                page-break-after: always;
+                            }
+            .recipe:first-child {
+                border-top: 0 none;
+                margin-top: 0;
+                padding-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Recipe -->
+<div class="recipe" itemscope itemtype="http://schema.org/Recipe" >
+    
+    <div class="infobox">
+
+        <!-- Image -->
+        <div class="photobox">
+            <a href="https://hips.hearstapps.com/del.h-cdn.co/assets/17/05/1486052795-delish-snickers-cheeseball-3.jpg">
+                <img src="Images/D920BBFB-0A1C-486C-87BA-21C59BDA0E38-675-0000A84F90FE071E/536D81DE-7345-4FD8-A9C0-C28BBCB08405-675-0000A853ED39230D.jpg" itemprop="image" class="photo photoswipe"/>
+            </a>
+                    </div>
+
+        <!-- Name -->
+        <h1 itemprop="name" class="name">Snickers Cheeseball</h1>
+        
+        <!-- Info -->
+        
+        <!-- Rating, categories -->
+        <p itemprop="aggregateRating" class="rating" value="0"></p>
+            <p itemprop="recipeCategory" class="categories">Appetizer, Dessert, Game Day Food</p>
+        
+        <p class="metadata">
+        
+            <!-- Cook time, prep time, servings, difficulty -->
+            <b>Prep Time: </b><span itemprop="">1</span>
+            <b>Cook Time: </b><span itemprop="">1</span>
+            <b>Servings: </b><span itemprop="">6 - 8</span>
+
+            <!-- Source -->
+                <b>Source: </b>
+                    <a itemprop="url" href="https://www.delish.com/cooking/recipe-ideas/recipes/a51135/snickers-cheeseball-recipe/">
+                        <span itemprop="author">delish.com</span>
+                    </a>
+                            
+        </p>
+        
+        <div class="clear"></div>
+
+    </div>
+    
+    <div class="left-column">
+
+        <!-- Ingredients -->
+        <div class="ingredientsbox">
+            <h3 class="subhead">Ingredients</h3>
+            <div class="ingredients text">
+                <p class="line" itemprop="recipeIngredient"><strong>12</strong> oz. cream cheese, softened</p><p class="line" itemprop="recipeIngredient"><strong>3/4</strong> c. powdered sugar</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> tsp. vanilla extract</p><p class="line" itemprop="recipeIngredient"><strong>1</strong> c. caramel sauce</p><p class="line" itemprop="recipeIngredient"><strong>1/3</strong> c. chocolate sauce</p><p class="line" itemprop="recipeIngredient"><strong>1/2</strong> c. Chopped roasted peanuts</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> c. chopped Snickers, for decorating ball</p><p class="line" itemprop="recipeIngredient">Graham crackers, for serving</p>
+            </div>
+        </div>
+        
+        <!-- Nutrition (in two-column mode it goes below the ingredients) -->
+
+    </div>
+    
+    <div class="right-column">
+    
+    <!-- Description -->
+
+    <!-- Directions -->
+    <div class="directionsbox">
+        <h3 class="subhead">Directions</h3>
+        <div itemprop="recipeInstructions" class="directions text">
+            <p class="line">In a medium bowl, beat cream cheese, powdered sugar, vanilla and caramel using a hand mixer until light and fluffy. Fold in chopped peanuts and chocolate sauce. Transfer mixture to plastic wrap and shape into a ball. Fold up sides and cover with plastic wrap.</p><p class="line">Refrigerate until slightly firm, 1 hour.</p><p class="line">Unwrap and place on serving platter.</p><p class="line">Press chopped Snickers all over. Let soften 20 minutes before serving, if necessary.</p><p class="line">Serve with graham crackers.</p>
+        </div>
+    </div>
+
+    <!-- Notes -->
+
+
+    <!-- Nutrition (in regular mode it goes below the notes) -->
+        <!-- Used in two different places depending on the recipe layout -->
+
+    
+    </div>
+    
+    <div class="clear"></div>
+
+</div>
+
+
+
+    </body>
+</html>

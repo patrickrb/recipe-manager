@@ -23,7 +23,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, ingredients, instructions, categories, notes } = body;
+    const {
+      title, description, image, ingredients, instructions, categories, notes,
+      sourceUrl, sourceAuthor, prepTime, cookTime, totalTime, servings, difficulty,
+      calories, protein, carbs, fat, fiber, sugar, sodium
+    } = body;
 
     if (!title) {
       return NextResponse.json(
@@ -36,10 +40,25 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         description: description || null,
+        image: image || null,
         ingredients: ingredients || [],
         instructions: instructions || [],
         categories: categories || [],
         notes: notes || null,
+        sourceUrl: sourceUrl || null,
+        sourceAuthor: sourceAuthor || null,
+        prepTime: prepTime || null,
+        cookTime: cookTime || null,
+        totalTime: totalTime || null,
+        servings: servings || null,
+        difficulty: difficulty || null,
+        calories: calories || null,
+        protein: protein || null,
+        carbs: carbs || null,
+        fat: fat || null,
+        fiber: fiber || null,
+        sugar: sugar || null,
+        sodium: sodium || null,
       },
     });
 

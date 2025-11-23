@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <style type="text/css">
+            /* Shared styles */
+            body {
+                font-family: Helvetica, sans-serif;
+                font-size: 16px;
+                color: #34302e;
+                margin: 0.25in;
+            }
+            @page {
+                size: letter portrait;
+                margin: 0.25in;
+            }
+            .name {
+                font-size: 18px;
+                font-family: Helvetica, sans-serif;
+                font-weight: normal;
+                margin: 0 0 10px 0;
+            }
+            .categories {
+                color: #605D5D;
+                font-size: 14px;
+                font-family: Helvetica, sans-serif;
+                font-style: italic;
+            }
+            .rating {
+                color: #d10505;
+                font-size: 14px;
+            }
+            .metadata {
+                font-size: 14px;
+            }
+            .infobox p {
+                margin: 0;
+                line-height: 150%;
+            }
+            .subhead {
+                color: #d10505;
+                font-weight: bold;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin: 10px 0;
+            }
+            
+            .ingredients p {
+                margin: 4px 0;
+            }
+            /* To prevent nutrition/directions from getting too close
+               to ingredients */
+            .ingredients {
+                padding-bottom: 10px;
+            }
+            .clear {
+                clear:both;
+            }
+            a {
+                color: #4990E2;
+                text-decoration: none;
+            }
+            /* Full page specific styles */
+            .text {
+                line-height: 130%;
+            }
+            .photobox {
+                float: left;
+                margin-right: 14px;
+                            }
+            .photo {
+                max-width: 140px;
+                max-height: 140px;
+                width: auto;
+                height: auto;
+            }
+            .inline-image {
+                max-width: 25%;
+                max-height: 25%;
+                width: auto;
+                height: auto;
+            }
+            .photoswipe {
+                border: 1px #dddddd solid;
+                cursor: pointer;
+            }
+            .pswp__caption__center {
+                text-align: center !important;
+            }
+            .recipe {
+                page-break-after: always;
+                            }
+            .recipe:first-child {
+                border-top: 0 none;
+                margin-top: 0;
+                padding-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Recipe -->
+<div class="recipe" itemscope itemtype="http://schema.org/Recipe" >
+    
+    <div class="infobox">
+
+        <!-- Image -->
+        <div class="photobox">
+            <a href="#">
+                <img src="Images/CB38C0ED-4F59-4719-B38F-46CD932C872D-27930-000713CB052C2BCD/852313E4-C0F8-4EBD-BDEE-41D82153CF50-27930-000713F78E4C5049.jpg" itemprop="image" class="photo photoswipe"/>
+            </a>
+                    </div>
+
+        <!-- Name -->
+        <h1 itemprop="name" class="name">MAC AND CHEESE</h1>
+        
+        <!-- Info -->
+        
+        <!-- Rating, categories -->
+        <p itemprop="aggregateRating" class="rating" value="0"></p>
+            <p itemprop="recipeCategory" class="categories">Pasta, Side Dishes</p>
+        
+        <p class="metadata">
+        
+            <!-- Cook time, prep time, servings, difficulty -->
+
+            <!-- Source -->
+                <b>Source: </b>
+                    <a itemprop="url" href="https://basicswithbabish.co/basicsepisodes/macandcheese">
+                        <span itemprop="author">BASICS WITH BABISH</span>
+                    </a>
+                            
+        </p>
+        
+        <div class="clear"></div>
+
+    </div>
+    
+    <div class="left-column">
+
+        <!-- Ingredients -->
+        <div class="ingredientsbox">
+            <h3 class="subhead">Ingredients</h3>
+            <div class="ingredients text">
+                <p class="line" itemprop="recipeIngredient"><em><strong><strong>Bechamel/Mornay Sauce Ingredients:</strong></strong></em></p><br/><p class="line" itemprop="recipeIngredient"><strong><strong>1.5</strong> lbs cheese, any make up of the following</strong>:</p><p class="line" itemprop="recipeIngredient">Parmesan, shredded</p><p class="line" itemprop="recipeIngredient">Gruyere, shredded</p><p class="line" itemprop="recipeIngredient">Sharp white cheddar, shredded</p><p class="line" itemprop="recipeIngredient">Fontina, shredded </p><p class="line" itemprop="recipeIngredient">Low moisture full-fat mozzarella, cubed</p><br/><br/><p class="line" itemprop="recipeIngredient"><strong>The rest</strong></p><p class="line" itemprop="recipeIngredient"><strong>1</strong> box dry pasta (16 oz)</p><p class="line" itemprop="recipeIngredient"><strong>¼</strong> cup butter</p><p class="line" itemprop="recipeIngredient"><strong>¼</strong> cup flour</p><p class="line" itemprop="recipeIngredient"><strong>4</strong> cups cold whole milk </p><p class="line" itemprop="recipeIngredient">Kosher salt</p><p class="line" itemprop="recipeIngredient">Freshly ground pepper</p><p class="line" itemprop="recipeIngredient">Cayenne pepper (optional)</p><p class="line" itemprop="recipeIngredient"><strong>2</strong> Tbsp whole grain mustard</p>
+            </div>
+        </div>
+        
+        <!-- Nutrition (in two-column mode it goes below the ingredients) -->
+
+    </div>
+    
+    <div class="right-column">
+    
+    <!-- Description -->
+
+    <!-- Directions -->
+    <div class="directionsbox">
+        <h3 class="subhead">Directions</h3>
+        <div itemprop="recipeInstructions" class="directions text">
+            <p class="line">Start by shredding the parmesan, gruyere, fontina, and sharp white cheddar on the large hole side of a box grater and cubing the mozzarella cheese. All together it should be 1 ½ lb. </p><p class="line">In a large saucepan, melt ¼ cup of butter over medium heat for 2-3 minutes until it stops spattering, the stage right before browning. Make sure to swirl regularly so the butter doesn’t splatter.</p><p class="line">At this point, add ¼ cup of flour and whisk into a thick paste and cook for 2-3 minutes until the raw flour smell dissipates. </p><p class="line">At which point, slowly add the 4 cups of cold milk a little at a time. Slowly add ½ cup of milk while whisking together until it reaches a smooth paste then add another ½ cup whisk until smooth, and so on and so forth until all of the 4 cups of milk have been added. </p><p class="line">Whisk that rigorously over medium-high heat until it comes to a bare simmer and reaches a consistency of just thicker than that of heavy cream. </p><p class="line">Once the bechamel is finished, combine all the cheese (except mozzarella) into a heatproof bowl. Pour the bechamel over top through a fine-mesh strainer. Fold the cheese into the bechamel and whisk until it is fully melted and turned into a mornay sauce. </p><p class="line">Season with a bunch of salt, freshly ground pepper, cayenne pepper (optional), and 2 tablespoons of whole grain mustard and whisk to combine.</p>
+        </div>
+    </div>
+
+    <!-- Notes -->
+
+
+    <!-- Nutrition (in regular mode it goes below the notes) -->
+        <!-- Used in two different places depending on the recipe layout -->
+
+    
+    </div>
+    
+    <div class="clear"></div>
+
+</div>
+
+<!-- Photo gallery is only included when exporting. -->
+<!-- PhotoSwipe gallery -->
+
+<link rel="stylesheet" href="Resources/PhotoSwipe/photoswipe.css">
+<link rel="stylesheet" href="Resources/PhotoSwipe/default-skin/default-skin.css">
+<script src="Resources/PhotoSwipe/photoswipe.min.js"></script>
+<script src="Resources/PhotoSwipe/photoswipe-ui-default.min.js"></script>
+
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="pswp__bg"></div>
+    <div class="pswp__scroll-wrap">
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close"></button>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var openPhotoSwipe = function(event) {
+        var pswp = document.querySelector('.pswp');
+        
+        var element = event.target;
+        var src = element.getAttribute('src');
+        
+        // build items array
+        var items = [
+            {
+                msrc: 'Images/CB38C0ED-4F59-4719-B38F-46CD932C872D-27930-000713CB052C2BCD/F5EEC69F-C7A3-4862-82B2-C44C93931EC0-27930-000713F6BFB9B29C.jpg',
+                src: 'Images/CB38C0ED-4F59-4719-B38F-46CD932C872D-27930-000713CB052C2BCD/F5EEC69F-C7A3-4862-82B2-C44C93931EC0-27930-000713F6BFB9B29C.jpg',
+                w: 0,
+                h: 0,
+                title: '1'
+            },
+        ];
+        
+        var index = 0;
+        for (var i=0; i<items.length; i++) {
+            var item = items[i];
+            if (item.src == src) {
+                index = i;
+            }
+        }
+                         
+        var options = {
+            index: index,
+            history: false,
+            focus: true,
+            captionEl: true,
+            fullscreenEl: false,
+            zoomEl: false,
+            shareEl: false,
+            preloaderEl: false,
+            bgOpacity: 0.9,
+            showHideOpacity: true
+        };
+                             
+        var gallery = new PhotoSwipe(pswp, PhotoSwipeUI_Default, items, options);
+        gallery.init();
+    };
+
+    var elements = document.querySelectorAll('.photoswipe');
+    for (var i=0; i<elements.length; i++) {
+        var element = elements[i];
+        element.addEventListener('click', openPhotoSwipe);
+    }
+</script>
+
+
+    </body>
+</html>

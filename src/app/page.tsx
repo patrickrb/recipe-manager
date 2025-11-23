@@ -1,20 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Recipe, RecipeFormData } from '@/types/recipe';
 import { RecipeCard } from '@/components/RecipeCard';
 import { RecipeForm } from '@/components/RecipeForm';
 
 export default function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [sortBy, setSortBy] = useState<'name' | 'recent' | 'rating'>('recent');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
 
   useEffect(() => {
     fetchRecipes();
   }, []);
+
+  useEffect(() => {
+    // Check if we should open edit form for a specific recipe
+    const editId = searchParams.get('edit');
+    if (editId && recipes.length > 0) {
+      const recipe = recipes.find(r => r.id === editId);
+      if (recipe) {
+        handleOpenForm(recipe);
+        // Clear the query parameter
+        router.replace('/');
+      }
+    }
+  }, [searchParams, recipes]);
 
   useEffect(() => {
     if (toast) {
@@ -115,6 +133,40 @@ export default function Home() {
     }
   };
 
+  // Get all unique categories
+  const allCategories = Array.from(
+    new Set(recipes.flatMap(recipe => recipe.categories))
+  ).sort();
+
+  // Filter and sort recipes
+  const getFilteredAndSortedRecipes = () => {
+    let filtered = recipes;
+
+    // Apply category filter
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(recipe =>
+        recipe.categories.includes(filterCategory)
+      );
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.title.localeCompare(b.title);
+        case 'rating':
+          return (b.rating || 0) - (a.rating || 0);
+        case 'recent':
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
+
+    return sorted;
+  };
+
+  const filteredAndSortedRecipes = getFilteredAndSortedRecipes();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Toast Notification */}
@@ -148,16 +200,78 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
             Recipe Manager
           </h1>
-          <button
-            onClick={() => handleOpenForm()}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span className="hidden sm:inline">New Recipe</span>
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => router.push('/import')}
+              className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+              <span className="hidden sm:inline">Import Recipe</span>
+            </button>
+            <button
+              onClick={() => handleOpenForm()}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="hidden sm:inline">New Recipe</span>
+            </button>
+          </div>
         </div>
+
+        {/* Sorting and Filtering Controls */}
+        {recipes.length > 0 && (
+          <div className="mb-8 bg-white rounded-lg shadow-md p-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                {/* Sort By */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="sort" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Sort by:
+                  </label>
+                  <select
+                    id="sort"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'name' | 'recent' | 'rating')}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
+                  >
+                    <option value="recent">Recently Added</option>
+                    <option value="name">Name (A-Z)</option>
+                    <option value="rating">Top Rated</option>
+                  </select>
+                </div>
+
+                {/* Filter by Category */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="category" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Category:
+                  </label>
+                  <select
+                    id="category"
+                    value={filterCategory}
+                    onChange={(e) => setFilterCategory(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
+                  >
+                    <option value="all">All Categories</option>
+                    {allCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Results Count */}
+              <div className="text-sm text-gray-600">
+                Showing {filteredAndSortedRecipes.length} of {recipes.length} recipe{recipes.length !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-96">
@@ -192,9 +306,35 @@ export default function Home() {
               Create Your First Recipe
             </button>
           </div>
+        ) : filteredAndSortedRecipes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-96 text-center">
+            <svg
+              className="w-24 h-24 text-gray-300 mb-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <h2 className="text-2xl font-semibold text-gray-600 mb-4">No recipes found</h2>
+            <p className="text-gray-500 mb-6 max-w-md">
+              No recipes match your current filter. Try selecting a different category.
+            </p>
+            <button
+              onClick={() => setFilterCategory('all')}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Clear Filter
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipes.map((recipe) => (
+            {filteredAndSortedRecipes.map((recipe) => (
               <RecipeCard
                 key={recipe.id}
                 recipe={recipe}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Recipe } from '@/types/recipe';
+import { useRouter } from 'next/navigation';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -9,14 +10,26 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
+  const router = useRouter();
+
   return (
     <div
-      className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow duration-200 cursor-pointer border border-gray-100"
-      onClick={() => onEdit(recipe)}
+      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 cursor-pointer border border-gray-100 overflow-hidden"
+      onClick={() => router.push(`/recipe/${recipe.id}`)}
     >
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="text-xl font-semibold text-gray-800">{recipe.title}</h3>
-        <div className="flex gap-2">
+      {recipe.image && (
+        <div className="w-full h-48 overflow-hidden">
+          <img
+            src={recipe.image}
+            alt={recipe.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">{recipe.title}</h3>
+          <div className="flex gap-2">
           <button
             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
             onClick={(e) => {
@@ -61,9 +74,20 @@ export function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
         </div>
       )}
 
-      <div className="flex justify-between text-sm text-gray-500 border-t border-gray-100 pt-4">
-        <span>{recipe.ingredients.length} ingredients</span>
-        <span>{recipe.instructions.length} steps</span>
+        <div className="flex justify-between items-center text-sm text-gray-500 border-t border-gray-100 pt-4">
+          <div className="flex gap-4">
+            <span>{recipe.ingredients.length} ingredients</span>
+            <span>{recipe.instructions.length} steps</span>
+          </div>
+          {recipe.rating ? (
+            <div className="flex items-center gap-1">
+              <svg className="w-4 h-4 text-yellow-400 fill-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+              <span className="text-gray-700 font-medium">{recipe.rating}</span>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
