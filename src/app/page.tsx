@@ -16,6 +16,7 @@ export default function Home() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [sortBy, setSortBy] = useState<'name' | 'recent' | 'rating'>('recent');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     fetchRecipes();
@@ -142,6 +143,23 @@ export default function Home() {
   const getFilteredAndSortedRecipes = () => {
     let filtered = recipes;
 
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(recipe => {
+        // Search in title
+        if (recipe.title.toLowerCase().includes(query)) return true;
+
+        // Search in description
+        if (recipe.description?.toLowerCase().includes(query)) return true;
+
+        // Search in ingredients
+        if (recipe.ingredients.some(ing => ing.toLowerCase().includes(query))) return true;
+
+        return false;
+      });
+    }
+
     // Apply category filter
     if (filterCategory !== 'all') {
       filtered = filtered.filter(recipe =>
@@ -225,49 +243,78 @@ export default function Home() {
         {/* Sorting and Filtering Controls */}
         {recipes.length > 0 && (
           <div className="mb-8 bg-white rounded-lg shadow-md p-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <div className="flex flex-col sm:flex-row gap-4 flex-1">
-                {/* Sort By */}
-                <div className="flex items-center gap-2">
-                  <label htmlFor="sort" className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                    Sort by:
-                  </label>
-                  <select
-                    id="sort"
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'name' | 'recent' | 'rating')}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
-                  >
-                    <option value="recent">Recently Added</option>
-                    <option value="name">Name (A-Z)</option>
-                    <option value="rating">Top Rated</option>
-                  </select>
+            <div className="flex flex-col gap-4">
+              {/* Search Bar */}
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </div>
-
-                {/* Filter by Category */}
-                <div className="flex items-center gap-2">
-                  <label htmlFor="category" className="text-sm font-medium text-gray-700 whitespace-nowrap">
-                    Category:
-                  </label>
-                  <select
-                    id="category"
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
+                <input
+                  type="text"
+                  placeholder="Search recipes by title, description, or ingredients..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
                   >
-                    <option value="all">All Categories</option>
-                    {allCategories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
-              {/* Results Count */}
-              <div className="text-sm text-gray-600">
-                Showing {filteredAndSortedRecipes.length} of {recipes.length} recipe{recipes.length !== 1 ? 's' : ''}
+              {/* Sort and Filter Row */}
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div className="flex flex-col sm:flex-row gap-4 flex-1">
+                  {/* Sort By */}
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="sort" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                      Sort by:
+                    </label>
+                    <select
+                      id="sort"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as 'name' | 'recent' | 'rating')}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
+                    >
+                      <option value="recent">Recently Added</option>
+                      <option value="name">Name (A-Z)</option>
+                      <option value="rating">Top Rated</option>
+                    </select>
+                  </div>
+
+                  {/* Filter by Category */}
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="category" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                      Category:
+                    </label>
+                    <select
+                      id="category"
+                      value={filterCategory}
+                      onChange={(e) => setFilterCategory(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
+                    >
+                      <option value="all">All Categories</option>
+                      {allCategories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Results Count */}
+                <div className="text-sm text-gray-600">
+                  Showing {filteredAndSortedRecipes.length} of {recipes.length} recipe{recipes.length !== 1 ? 's' : ''}
+                </div>
               </div>
             </div>
           </div>
@@ -323,13 +370,16 @@ export default function Home() {
             </svg>
             <h2 className="text-2xl font-semibold text-gray-600 mb-4">No recipes found</h2>
             <p className="text-gray-500 mb-6 max-w-md">
-              No recipes match your current filter. Try selecting a different category.
+              No recipes match your current {searchQuery ? 'search' : 'filter'}. Try {searchQuery ? 'a different search term' : 'selecting a different category'}.
             </p>
             <button
-              onClick={() => setFilterCategory('all')}
+              onClick={() => {
+                setSearchQuery('');
+                setFilterCategory('all');
+              }}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Clear Filter
+              Clear All Filters
             </button>
           </div>
         ) : (
