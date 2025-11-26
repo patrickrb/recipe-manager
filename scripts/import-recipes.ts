@@ -1,10 +1,10 @@
 // Simple script to trigger the recipe import via API
 async function importRecipes() {
   console.log('Starting recipe import...\n');
-  console.log('Make sure your dev server is running on http://localhost:3000\n');
+  console.log('Importing to production server: https://recipe-manager-zeta-topaz.vercel.app\n');
 
   try {
-    const response = await fetch('http://localhost:3000/api/import-recipes', {
+    const response = await fetch('https://recipe-manager-zeta-topaz.vercel.app/api/import-recipes', {
       method: 'POST',
     });
 
@@ -28,7 +28,7 @@ async function importRecipes() {
 
   } catch (error) {
     console.error('Error:', error instanceof Error ? error.message : error);
-    console.error('\nMake sure the dev server is running: npm run dev');
+    console.error('\nMake sure the production server is accessible.');
     process.exit(1);
   }
 }
