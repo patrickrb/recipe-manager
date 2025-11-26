@@ -1,14 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Recipe, RecipeFormData } from '@/types/recipe';
 import { RecipeCard } from '@/components/RecipeCard';
 import { RecipeForm } from '@/components/RecipeForm';
 
-export default function Home() {
+// Component to handle URL search params
+function SearchParamsHandler({
+  recipes,
+  onEditRecipe
+}: {
+  recipes: Recipe[];
+  onEditRecipe: (recipe: Recipe) => void;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Check if we should open edit form for a specific recipe
+    const editId = searchParams.get('edit');
+    if (editId && recipes.length > 0) {
+      const recipe = recipes.find(r => r.id === editId);
+      if (recipe) {
+        onEditRecipe(recipe);
+        // Clear the query parameter
+        router.replace('/');
+      }
+    }
+  }, [searchParams, recipes, onEditRecipe, router]);
+
+  return null;
+}
+
+function HomeContent() {
+  const router = useRouter();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,18 +48,10 @@ export default function Home() {
     fetchRecipes();
   }, []);
 
-  useEffect(() => {
-    // Check if we should open edit form for a specific recipe
-    const editId = searchParams.get('edit');
-    if (editId && recipes.length > 0) {
-      const recipe = recipes.find(r => r.id === editId);
-      if (recipe) {
-        handleOpenForm(recipe);
-        // Clear the query parameter
-        router.replace('/');
-      }
-    }
-  }, [searchParams, recipes]);
+  const handleOpenForm = (recipe?: Recipe) => {
+    setSelectedRecipe(recipe || null);
+    setIsFormOpen(true);
+  };
 
   useEffect(() => {
     if (toast) {
@@ -114,11 +132,6 @@ export default function Home() {
     } catch (error) {
       showToast('Error deleting recipe. Please try again.', 'error');
     }
-  };
-
-  const handleOpenForm = (recipe?: Recipe) => {
-    setSelectedRecipe(recipe || null);
-    setIsFormOpen(true);
   };
 
   const handleCloseForm = () => {
@@ -402,7 +415,16 @@ export default function Home() {
           recipe={selectedRecipe}
         />
       </div>
+
+      {/* Handle search params for edit functionality */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler recipes={recipes} onEditRecipe={handleOpenForm} />
+      </Suspense>
     </div>
   );
+}
+
+export default function Home() {
+  return <HomeContent />;
 }
 
