@@ -42,7 +42,7 @@ function HomeContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [sortBy, setSortBy] = useState<'name' | 'recent' | 'rating'>('recent');
+  const [sortBy, setSortBy] = useState<'name' | 'recent' | 'rating'>('name');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
