@@ -18,34 +18,50 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            console.error('[AUTH] Missing credentials');
+            return null;
+          }
+
+          console.log('[AUTH] Attempting to find user:', credentials.email);
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          });
+
+          if (!user) {
+            console.error('[AUTH] User not found:', credentials.email);
+            return null;
+          }
+
+          if (!user.password) {
+            console.error('[AUTH] User has no password:', credentials.email);
+            return null;
+          }
+
+          console.log('[AUTH] Comparing passwords for user:', credentials.email);
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password as string,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            console.error('[AUTH] Invalid password for user:', credentials.email);
+            return null;
+          }
+
+          console.log('[AUTH] Login successful for user:', credentials.email);
+          return {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role,
+            avatar: user.avatar,
+          };
+        } catch (error) {
+          console.error('[AUTH] Error during authorization:', error);
           return null;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
-
-        if (!user || !user.password) {
-          return null;
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          role: user.role,
-          avatar: user.avatar,
-        };
       },
     }),
   ],
