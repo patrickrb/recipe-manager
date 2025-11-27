@@ -25,6 +25,11 @@ export default function RecipeView() {
     }
   }, [id]);
 
+  // Scroll to top when component mounts or id changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   const fetchRecipe = async () => {
     try {
       const response = await fetch(`/api/recipes/${id}`);
