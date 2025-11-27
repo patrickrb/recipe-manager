@@ -24,6 +24,11 @@ export interface Recipe {
   sodium: number | null;
   createdAt: Date | string;
   updatedAt: Date | string;
+  user?: {
+    id: string;
+    username: string;
+    avatar: string | null;
+  };
 }
 
 export interface RecipeFormData {

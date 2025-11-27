@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
+import { isAdmin } from '@/lib/auth';
 
-// GET /api/recipes/[id] - Get a single recipe
+// GET /api/recipes/[id] - Get a single recipe (public)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -29,12 +31,28 @@ export async function GET(
   }
 }
 
-// PUT /api/recipes/[id] - Update a recipe
+// PUT /api/recipes/[id] - Update a recipe (admins only)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    if (!isAdmin(session.user.role)) {
+      return NextResponse.json(
+        { error: 'Forbidden: Only admins can update recipes' },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
     const body = await request.json();
     const {
@@ -81,12 +99,28 @@ export async function PUT(
   }
 }
 
-// DELETE /api/recipes/[id] - Delete a recipe
+// DELETE /api/recipes/[id] - Delete a recipe (admins only)
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    if (!isAdmin(session.user.role)) {
+      return NextResponse.json(
+        { error: 'Forbidden: Only admins can delete recipes' },
+        { status: 403 }
+      );
+    }
+
     const { id } = await params;
     await prisma.recipe.delete({
       where: { id },

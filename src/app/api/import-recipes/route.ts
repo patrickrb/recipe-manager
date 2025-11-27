@@ -3,6 +3,8 @@ import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import * as cheerio from 'cheerio';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
+import { isAdmin } from '@/lib/auth';
 
 interface ParsedRecipe {
   title: string;
@@ -205,6 +207,23 @@ async function downloadAndUploadImage(imageUrl: string, baseUrl: string): Promis
 }
 
 export async function POST(request: NextRequest) {
+  // Require admin authentication
+  const session = await auth();
+
+  if (!session?.user) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
+  if (!isAdmin(session.user.role)) {
+    return NextResponse.json(
+      { error: 'Forbidden: Only admins can import recipes' },
+      { status: 403 }
+    );
+  }
+
   const recipesDir = join(process.cwd(), 'recipes');
   const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
 

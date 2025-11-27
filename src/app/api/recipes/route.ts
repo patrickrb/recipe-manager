@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
+import { isAdmin } from '@/lib/auth';
 
-// GET /api/recipes - List all recipes
+// GET /api/recipes - List all recipes (public)
 export async function GET() {
   try {
     const recipes = await prisma.recipe.findMany({
       orderBy: {
-        updatedAt: 'desc',
+        title: 'asc',
       },
     });
     return NextResponse.json(recipes);
@@ -19,9 +21,25 @@ export async function GET() {
   }
 }
 
-// POST /api/recipes - Create a new recipe
+// POST /api/recipes - Create a new recipe (admins only)
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    if (!isAdmin(session.user.role)) {
+      return NextResponse.json(
+        { error: 'Forbidden: Only admins can create recipes' },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json();
     const {
       title, description, image, ingredients, instructions, categories, notes,
@@ -59,6 +77,15 @@ export async function POST(request: NextRequest) {
         fiber: fiber || null,
         sugar: sugar || null,
         sodium: sodium || null,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true,
+          },
+        },
       },
     });
 
