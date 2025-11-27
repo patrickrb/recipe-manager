@@ -3,15 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Recipe } from '@/types/recipe';
+import { useSession } from '@/hooks/useSession';
 
 export default function RecipeView() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const { isAdmin, user } = useSession();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [scrapedImages, setScrapedImages] = useState<Array<{ url: string; alt: string | null }>>([]);
+  const [isScrapingImages, setIsScrapingImages] = useState(false);
+  const [isSavingImage, setIsSavingImage] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -74,6 +80,66 @@ export default function RecipeView() {
     } catch (err) {
       alert('Failed to update rating. Please try again.');
       console.error(err);
+    }
+  };
+
+  const handleScanImages = async () => {
+    if (!recipe?.sourceUrl) {
+      alert('No source URL available for this recipe');
+      return;
+    }
+
+    setIsScrapingImages(true);
+    setShowImageModal(true);
+    setScrapedImages([]);
+
+    try {
+      const response = await fetch('/api/scrape-images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: recipe.sourceUrl }),
+      });
+
+      if (!response.ok) throw new Error('Failed to scrape images');
+
+      const data = await response.json();
+      setScrapedImages(data.images || []);
+
+      if (data.images.length === 0) {
+        alert('No images found on the source page');
+      }
+    } catch (err) {
+      alert('Failed to scrape images. Please try again.');
+      console.error(err);
+      setShowImageModal(false);
+    } finally {
+      setIsScrapingImages(false);
+    }
+  };
+
+  const handleSelectImage = async (imageUrl: string) => {
+    if (!recipe) return;
+
+    setIsSavingImage(true);
+
+    try {
+      const response = await fetch(`/api/recipes/${id}/save-image`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl }),
+      });
+
+      if (!response.ok) throw new Error('Failed to save image');
+
+      const data = await response.json();
+      setRecipe(data.recipe);
+      setShowImageModal(false);
+      alert('Image saved successfully!');
+    } catch (err) {
+      alert('Failed to save image. Please try again.');
+      console.error(err);
+    } finally {
+      setIsSavingImage(false);
     }
   };
 
@@ -152,6 +218,17 @@ export default function RecipeView() {
           <div className="flex justify-between items-start">
             <h1 className="text-4xl font-bold text-gray-900">{recipe.title}</h1>
             <div className="flex gap-2">
+              {isAdmin && recipe.sourceUrl && (
+                <button
+                  onClick={handleScanImages}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Scan for Recipe Images
+                </button>
+              )}
               <button
                 onClick={handleEdit}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -400,6 +477,98 @@ export default function RecipeView() {
             )}
           </div>
         </div>
+
+        {/* Image Selection Modal */}
+        {showImageModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+              {/* Modal Header */}
+              <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">Select Recipe Image</h2>
+                <button
+                  onClick={() => setShowImageModal(false)}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  disabled={isSavingImage}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Modal Content */}
+              <div className="flex-1 overflow-y-auto p-6">
+                {isScrapingImages ? (
+                  <div className="flex flex-col items-center justify-center py-16">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600 mb-4"></div>
+                    <p className="text-gray-600">Scanning for images...</p>
+                  </div>
+                ) : scrapedImages.length === 0 ? (
+                  <div className="text-center py-16">
+                    <p className="text-gray-600">No images found</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {scrapedImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className="group relative border-2 border-gray-200 rounded-lg overflow-hidden hover:border-purple-500 hover:shadow-xl transition-all bg-white"
+                      >
+                        <div className="w-full h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={`/api/proxy-image?url=${encodeURIComponent(image.url)}`}
+                            alt={image.alt || `Recipe image ${index + 1}`}
+                            className="max-w-full max-h-full object-contain"
+                            onLoad={(e) => {
+                              console.log('Image loaded:', image.url);
+                            }}
+                            onError={(e) => {
+                              console.error('Image failed to load:', image.url);
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const errorDiv = document.createElement('div');
+                              errorDiv.className = 'flex items-center justify-center w-full h-full text-red-500 text-sm';
+                              errorDiv.textContent = 'Failed to load';
+                              target.parentElement!.appendChild(errorDiv);
+                            }}
+                          />
+                        </div>
+                        {image.alt && (
+                          <div className="p-2 bg-white border-t border-gray-200">
+                            <p className="text-xs text-gray-600 truncate" title={image.alt}>{image.alt}</p>
+                          </div>
+                        )}
+                        <div className="p-3 bg-white border-t border-gray-200">
+                          <button
+                            className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:bg-gray-400"
+                            onClick={() => !isSavingImage && handleSelectImage(image.url)}
+                            disabled={isSavingImage}
+                          >
+                            {isSavingImage ? 'Saving...' : 'Select This Image'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                <p className="text-sm text-gray-600">
+                  {scrapedImages.length} {scrapedImages.length === 1 ? 'image' : 'images'} found
+                </p>
+                <button
+                  onClick={() => setShowImageModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+                  disabled={isSavingImage}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
