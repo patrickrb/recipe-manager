@@ -21,10 +21,13 @@ export function useSession() {
     fetch("/api/auth/session")
       .then((res) => res.json())
       .then((data) => {
+        console.log('[useSession] Session data:', data);
+        console.log('[useSession] User role:', data?.user?.role);
         setUser(data?.user || null);
         setIsLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('[useSession] Error fetching session:', err);
         setUser(null);
         setIsLoading(false);
       });
@@ -36,6 +39,8 @@ export function useSession() {
 
   const isAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
   const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
+
+  console.log('[useSession] isAdmin:', isAdmin, 'user role:', user?.role);
 
   return { user, isLoading, isAdmin, isSuperAdmin };
 }
