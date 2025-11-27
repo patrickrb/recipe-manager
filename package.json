@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma migrate deploy && next build",
+    "build": "prisma generate && prisma migrate deploy && npm run seed && next build",
     "start": "next start",
     "lint": "eslint",
     "import-recipes": "tsx scripts/import-recipes.ts",
