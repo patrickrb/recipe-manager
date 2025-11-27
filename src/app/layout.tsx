@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 import { SessionProvider } from "@/contexts/SessionContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 
 export const metadata: Metadata = {
   title: "Recipe Manager",
@@ -17,8 +18,10 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <SessionProvider>
-          <Navigation />
-          {children}
+          <ToastProvider>
+            <Navigation />
+            {children}
+          </ToastProvider>
         </SessionProvider>
       </body>
     </html>

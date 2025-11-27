@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Recipe, RecipeFormData } from '@/types/recipe';
+import { useToast } from '@/contexts/ToastContext';
 
 interface RecipeFormProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface RecipeFormProps {
 }
 
 export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps) {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<RecipeFormData>({
     title: '',
     description: '',
@@ -105,13 +107,13 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      showToast('Please select an image file', 'error');
       return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image size must be less than 5MB');
+      showToast('Image size must be less than 5MB', 'error');
       return;
     }
 
@@ -147,7 +149,7 @@ export function RecipeForm({ isOpen, onClose, onSave, recipe }: RecipeFormProps)
       setImageFile(null);
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please try again.');
+      showToast('Failed to upload image. Please try again.', 'error');
     } finally {
       setIsUploading(false);
     }

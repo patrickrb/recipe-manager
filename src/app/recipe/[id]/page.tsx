@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Recipe } from '@/types/recipe';
 import { useSession } from '@/hooks/useSession';
+import { useToast } from '@/contexts/ToastContext';
 
 export default function RecipeView() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
   const { isAdmin, user } = useSession();
+  const { showToast } = useToast();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,7 +62,7 @@ export default function RecipeView() {
 
       router.push('/');
     } catch (err) {
-      alert('Failed to delete recipe. Please try again.');
+      showToast('Failed to delete recipe. Please try again.', 'error');
       console.error(err);
     }
   };
@@ -83,14 +85,14 @@ export default function RecipeView() {
       const updatedRecipe = await response.json();
       setRecipe(updatedRecipe);
     } catch (err) {
-      alert('Failed to update rating. Please try again.');
+      showToast('Failed to update rating. Please try again.', 'error');
       console.error(err);
     }
   };
 
   const handleScanImages = async () => {
     if (!recipe?.sourceUrl) {
-      alert('No source URL available for this recipe');
+      showToast('No source URL available for this recipe', 'warning');
       return;
     }
 
@@ -111,10 +113,10 @@ export default function RecipeView() {
       setScrapedImages(data.images || []);
 
       if (data.images.length === 0) {
-        alert('No images found on the source page');
+        showToast('No images found on the source page', 'info');
       }
     } catch (err) {
-      alert('Failed to scrape images. Please try again.');
+      showToast('Failed to scrape images. Please try again.', 'error');
       console.error(err);
       setShowImageModal(false);
     } finally {
@@ -139,9 +141,9 @@ export default function RecipeView() {
       const data = await response.json();
       setRecipe(data.recipe);
       setShowImageModal(false);
-      alert('Image saved successfully!');
+      showToast('Image saved successfully!', 'success');
     } catch (err) {
-      alert('Failed to save image. Please try again.');
+      showToast('Failed to save image. Please try again.', 'error');
       console.error(err);
     } finally {
       setIsSavingImage(false);
