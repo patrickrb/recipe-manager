@@ -14,10 +14,16 @@ export function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
   const router = useRouter();
   const { isAdmin } = useSession();
 
+  const handleCardClick = () => {
+    // Save current scroll position before navigating
+    sessionStorage.setItem('homeScrollPos', window.scrollY.toString());
+    router.push(`/recipe/${recipe.id}`);
+  };
+
   return (
     <div
       className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 cursor-pointer border border-gray-100 overflow-hidden"
-      onClick={() => router.push(`/recipe/${recipe.id}`)}
+      onClick={handleCardClick}
     >
       <div className="w-full h-48 overflow-hidden bg-gray-200">
         {recipe.image ? (

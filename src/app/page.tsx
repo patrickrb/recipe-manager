@@ -50,6 +50,20 @@ function HomeContent() {
     fetchRecipes();
   }, []);
 
+  // Restore scroll position after recipes are loaded
+  useEffect(() => {
+    if (!isLoading && recipes.length > 0) {
+      const savedScrollPos = sessionStorage.getItem('homeScrollPos');
+      if (savedScrollPos) {
+        // Use requestAnimationFrame to ensure DOM is fully rendered
+        requestAnimationFrame(() => {
+          window.scrollTo(0, parseInt(savedScrollPos));
+          sessionStorage.removeItem('homeScrollPos');
+        });
+      }
+    }
+  }, [isLoading, recipes.length]);
+
   const handleOpenForm = (recipe?: Recipe) => {
     setSelectedRecipe(recipe || null);
     setIsFormOpen(true);
