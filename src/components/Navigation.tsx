@@ -3,6 +3,7 @@
 import { useSession } from "@/hooks/useSession";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export function Navigation() {
@@ -46,10 +47,13 @@ export function Navigation() {
               <>
                 <div className="flex items-center gap-3">
                   {user.avatar ? (
-                    <img
+                    <Image
                       src={user.avatar}
                       alt={user.username}
-                      className="w-8 h-8 rounded-full object-cover"
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">

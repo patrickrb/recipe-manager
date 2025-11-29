@@ -22,7 +22,9 @@ function extractRecipeSchema($: cheerio.CheerioAPI): Partial<ScrapedRecipe> | nu
       if (!content) continue;
 
       const data = JSON.parse(content);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const recipe = Array.isArray(data)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? data.find((item: any) => item['@type'] === 'Recipe')
         : data['@type'] === 'Recipe' ? data : null;
 
@@ -61,14 +63,14 @@ function extractRecipeSchema($: cheerio.CheerioAPI): Partial<ScrapedRecipe> | nu
           ingredients: Array.isArray(recipe.recipeIngredient)
             ? recipe.recipeIngredient
             : typeof recipe.recipeIngredient === 'string'
-            ? [recipe.recipeIngredient]
-            : [],
+              ? [recipe.recipeIngredient]
+              : [],
           instructions: extractInstructions(recipe),
           categories: categories.filter(Boolean).slice(0, 5), // Limit to 5 categories
           image: primaryImage,
         };
       }
-    } catch (e) {
+    } catch (_) {
       // Continue to next script tag
     }
   }
@@ -76,10 +78,12 @@ function extractRecipeSchema($: cheerio.CheerioAPI): Partial<ScrapedRecipe> | nu
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractInstructions(recipe: any): string[] {
   if (!recipe.recipeInstructions) return [];
 
   if (Array.isArray(recipe.recipeInstructions)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return recipe.recipeInstructions.map((instruction: any) => {
       if (typeof instruction === 'string') return instruction;
       if (instruction.text) return instruction.text;
@@ -104,13 +108,13 @@ function extractRecipeFromHTML($: cheerio.CheerioAPI): Partial<ScrapedRecipe> {
 
   // Try to find title
   result.title = $('h1').first().text().trim() ||
-                 $('title').text().trim() ||
-                 '';
+    $('title').text().trim() ||
+    '';
 
   // Try to find description
   result.description = $('meta[name="description"]').attr('content') ||
-                       $('meta[property="og:description"]').attr('content') ||
-                       $('p').first().text().trim();
+    $('meta[property="og:description"]').attr('content') ||
+    $('p').first().text().trim();
 
   // Try to extract categories from meta tags and content
   const categories = new Set<string>();
@@ -208,7 +212,7 @@ function extractAllImages($: cheerio.CheerioAPI, baseUrl: string): string[] {
       const url = new URL(ogImage, baseUrl).href;
       priorityImages.push(url);
       console.log('Found OG image:', url);
-    } catch (e) {
+    } catch (_) {
       console.log('Failed to parse OG image URL:', ogImage);
     }
   }
@@ -220,7 +224,7 @@ function extractAllImages($: cheerio.CheerioAPI, baseUrl: string): string[] {
       const url = new URL(twitterImage, baseUrl).href;
       priorityImages.push(url);
       console.log('Found Twitter image:', url);
-    } catch (e) {
+    } catch (_) {
       console.log('Failed to parse Twitter image URL:', twitterImage);
     }
   }
@@ -260,7 +264,7 @@ function extractAllImages($: cheerio.CheerioAPI, baseUrl: string): string[] {
         }
 
         regularImages.add(absoluteUrl);
-      } catch (e) {
+      } catch (_) {
         // Skip invalid URLs
       }
     }
@@ -295,7 +299,7 @@ export async function POST(request: NextRequest) {
     let parsedUrl: URL;
     try {
       parsedUrl = new URL(url);
-    } catch (e) {
+    } catch (_) {
       return NextResponse.json(
         { error: 'Invalid URL' },
         { status: 400 }
@@ -319,16 +323,17 @@ export async function POST(request: NextRequest) {
         },
         signal: controller.signal,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       clearTimeout(timeout);
-      if (error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError') {
         return NextResponse.json(
           { error: 'Request timeout - the website took too long to respond' },
           { status: 408 }
         );
       }
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       return NextResponse.json(
-        { error: `Failed to fetch URL: ${error.message}` },
+        { error: `Failed to fetch URL: ${errorMessage}` },
         { status: 500 }
       );
     } finally {

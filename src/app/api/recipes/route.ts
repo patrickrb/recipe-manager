@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { isAdmin } from '@/lib/auth';
+import { recipeSchema } from '@/lib/validations';
 
 // GET /api/recipes - List all recipes (public)
 export async function GET() {
@@ -41,18 +42,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+
+    // Validate request body
+    const validationResult = recipeSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: 'Validation failed', details: validationResult.error.format() },
+        { status: 400 }
+      );
+    }
+
     const {
       title, description, image, ingredients, instructions, categories, notes,
       sourceUrl, sourceAuthor, prepTime, cookTime, totalTime, servings, difficulty,
       calories, protein, carbs, fat, fiber, sugar, sodium
-    } = body;
-
-    if (!title) {
-      return NextResponse.json(
-        { error: 'Title is required' },
-        { status: 400 }
-      );
-    }
+    } = validationResult.data;
 
     const recipe = await prisma.recipe.create({
       data: {
@@ -77,6 +81,7 @@ export async function POST(request: NextRequest) {
         fiber: fiber || null,
         sugar: sugar || null,
         sodium: sodium || null,
+        userId: session.user.id,
       },
       include: {
         user: {

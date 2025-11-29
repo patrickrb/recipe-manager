@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { RecipeFormData } from '@/types/recipe';
 
@@ -173,7 +174,7 @@ export default function ImportRecipe() {
               Import Recipe from URL
             </h1>
             <p className="text-gray-600 mt-2">
-              Paste a recipe URL and we'll extract the ingredients, instructions, and images for you.
+              Paste a recipe URL and we&apos;ll extract the ingredients, instructions, and images for you.
             </p>
           </div>
 
@@ -191,8 +192,8 @@ export default function ImportRecipe() {
                   placeholder="https://example.com/recipe"
                   required
                 />
-                <p className="text-sm text-gray-500 mt-2">
-                  Enter the URL of a recipe from any website
+                <p className="text-sm text-gray-500">
+                  We&apos;ll try to extract the recipe details automatically.
                 </p>
               </div>
 
@@ -304,11 +305,10 @@ export default function ImportRecipe() {
                     <button
                       type="button"
                       onClick={() => setImageObjectFit('cover')}
-                      className={`px-3 py-1 text-xs rounded ${
-                        imageObjectFit === 'cover'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                      className={`px-3 py-1 text-xs rounded ${imageObjectFit === 'cover'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
                       title="Crop to fill (may cut edges)"
                     >
                       Fill
@@ -316,11 +316,10 @@ export default function ImportRecipe() {
                     <button
                       type="button"
                       onClick={() => setImageObjectFit('contain')}
-                      className={`px-3 py-1 text-xs rounded ${
-                        imageObjectFit === 'contain'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                      className={`px-3 py-1 text-xs rounded ${imageObjectFit === 'contain'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
                       title="Show entire image"
                     >
                       Fit
@@ -328,27 +327,26 @@ export default function ImportRecipe() {
                     <button
                       type="button"
                       onClick={() => setImageObjectFit('fill')}
-                      className={`px-3 py-1 text-xs rounded ${
-                        imageObjectFit === 'fill'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                      className={`px-3 py-1 text-xs rounded ${imageObjectFit === 'fill'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
                       title="Stretch to fill"
                     >
                       Stretch
                     </button>
                   </div>
                 </div>
-                <div className={`relative w-full h-64 rounded-lg overflow-hidden border border-gray-300 ${
-                  imageObjectFit === 'contain' ? 'bg-gray-100' : ''
-                }`}>
-                  <img
-                    src={formData.image}
+                <div className={`relative w-full h-64 rounded-lg overflow-hidden border border-gray-300 ${imageObjectFit === 'contain' ? 'bg-gray-100' : ''
+                  }`}>
+                  <NextImage
+                    src={formData.image.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(formData.image)}` : formData.image}
                     alt="Selected recipe"
-                    className={`w-full h-full object-${imageObjectFit}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '';
-                      (e.target as HTMLImageElement).alt = 'Failed to load image';
+                    fill
+                    className={`object-${imageObjectFit}`}
+                    unoptimized
+                    onError={() => {
+                      // Handle error if needed
                     }}
                   />
                 </div>
@@ -367,19 +365,17 @@ export default function ImportRecipe() {
                       key={index}
                       type="button"
                       onClick={() => setFormData({ ...formData, image: img })}
-                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                        formData.image === img
-                          ? 'border-blue-500 ring-2 ring-blue-200'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
+                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${formData.image === img
+                        ? 'border-blue-500 ring-2 ring-blue-200'
+                        : 'border-gray-200 hover:border-blue-300'
+                        }`}
                     >
-                      <img
-                        src={img}
+                      <NextImage
+                        src={img.startsWith('http') ? `/api/proxy-image?url=${encodeURIComponent(img)}` : img}
                         alt={`Option ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
+                        fill
+                        className="object-cover"
+                        unoptimized
                       />
                       {formData.image === img && (
                         <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import NextImage from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
 import { Recipe } from '@/types/recipe';
 import { useSession } from '@/hooks/useSession';
@@ -165,11 +166,10 @@ export default function RecipeView() {
             className="transition-colors"
           >
             <svg
-              className={`w-8 h-8 ${
-                star <= (hover || rating)
-                  ? 'text-yellow-400 fill-yellow-400'
-                  : 'text-gray-300 fill-gray-300'
-              }`}
+              className={`w-8 h-8 ${star <= (hover || rating)
+                ? 'text-yellow-400 fill-yellow-400'
+                : 'text-gray-300 fill-gray-300'
+                }`}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
             >
@@ -261,11 +261,13 @@ export default function RecipeView() {
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           {/* Image */}
           {recipe.image && (
-            <div className="w-full h-96 overflow-hidden">
-              <img
+            <div className="w-full h-96 relative">
+              <NextImage
                 src={recipe.image}
                 alt={recipe.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                unoptimized
               />
             </div>
           )}
@@ -521,23 +523,13 @@ export default function RecipeView() {
                         key={index}
                         className="group relative border-2 border-gray-200 rounded-lg overflow-hidden hover:border-purple-500 hover:shadow-xl transition-all bg-white"
                       >
-                        <div className="w-full h-64 bg-gray-100 flex items-center justify-center overflow-hidden">
-                          <img
+                        <div className="w-full h-64 bg-gray-100 flex items-center justify-center overflow-hidden relative">
+                          <NextImage
                             src={`/api/proxy-image?url=${encodeURIComponent(image.url)}`}
                             alt={image.alt || `Recipe image ${index + 1}`}
-                            className="max-w-full max-h-full object-contain"
-                            onLoad={(e) => {
-                              console.log('Image loaded:', image.url);
-                            }}
-                            onError={(e) => {
-                              console.error('Image failed to load:', image.url);
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const errorDiv = document.createElement('div');
-                              errorDiv.className = 'flex items-center justify-center w-full h-full text-red-500 text-sm';
-                              errorDiv.textContent = 'Failed to load';
-                              target.parentElement!.appendChild(errorDiv);
-                            }}
+                            fill
+                            className="object-contain"
+                            unoptimized
                           />
                         </div>
                         {image.alt && (
