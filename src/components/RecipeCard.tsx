@@ -10,15 +10,21 @@ interface RecipeCardProps {
   recipe: Recipe;
   onEdit: (recipe: Recipe) => void;
   onDelete: (id: string) => void;
+  searchQuery: string;
+  sortBy: 'name' | 'recent' | 'rating';
+  filterCategory: string;
 }
 
-export function RecipeCard({ recipe, onEdit, onDelete }: RecipeCardProps) {
+export function RecipeCard({ recipe, onEdit, onDelete, searchQuery, sortBy, filterCategory }: RecipeCardProps) {
   const router = useRouter();
   const { isAdmin } = useSession();
 
   const handleCardClick = () => {
-    // Save current scroll position before navigating
+    // Save current scroll position and search state before navigating
     sessionStorage.setItem('homeScrollPos', window.scrollY.toString());
+    sessionStorage.setItem('homeSearchQuery', searchQuery);
+    sessionStorage.setItem('homeSortBy', sortBy);
+    sessionStorage.setItem('homeFilterCategory', filterCategory);
     router.push(`/recipe/${recipe.id}`);
   };
 

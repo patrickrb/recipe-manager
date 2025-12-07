@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { isAdmin } from '@/lib/auth';
 import { recipeSchema } from '@/lib/validations';
+import { deserializeRecipe } from '@/lib/recipe-adapter';
 
 // GET /api/recipes - List all recipes (public)
 export async function GET() {
@@ -12,7 +13,7 @@ export async function GET() {
         title: 'asc',
       },
     });
-    return NextResponse.json(recipes);
+    return NextResponse.json(recipes.map(deserializeRecipe));
   } catch (error) {
     console.error('Error fetching recipes:', error);
     return NextResponse.json(
@@ -63,9 +64,9 @@ export async function POST(request: NextRequest) {
         title,
         description: description || null,
         image: image || null,
-        ingredients: ingredients || [],
-        instructions: instructions || [],
-        categories: categories || [],
+        ingredients: JSON.stringify(ingredients || []),
+        instructions: JSON.stringify(instructions || []),
+        categories: JSON.stringify(categories || []),
         notes: notes || null,
         sourceUrl: sourceUrl || null,
         sourceAuthor: sourceAuthor || null,
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(recipe, { status: 201 });
+    return NextResponse.json(deserializeRecipe(recipe), { status: 201 });
   } catch (error) {
     console.error('Error creating recipe:', error);
     return NextResponse.json(

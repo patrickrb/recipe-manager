@@ -49,10 +49,29 @@ function HomeContent() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Restore scroll position
+  // Restore scroll position and search state
   useEffect(() => {
     if (!isLoading && recipes.length > 0) {
       const savedScrollPos = sessionStorage.getItem('homeScrollPos');
+      const savedSearchQuery = sessionStorage.getItem('homeSearchQuery');
+      const savedSortBy = sessionStorage.getItem('homeSortBy');
+      const savedFilterCategory = sessionStorage.getItem('homeFilterCategory');
+
+      if (savedSearchQuery !== null) {
+        setSearchQuery(savedSearchQuery);
+        sessionStorage.removeItem('homeSearchQuery');
+      }
+
+      if (savedSortBy) {
+        setSortBy(savedSortBy as 'name' | 'recent' | 'rating');
+        sessionStorage.removeItem('homeSortBy');
+      }
+
+      if (savedFilterCategory) {
+        setFilterCategory(savedFilterCategory);
+        sessionStorage.removeItem('homeFilterCategory');
+      }
+
       if (savedScrollPos) {
         requestAnimationFrame(() => {
           window.scrollTo(0, parseInt(savedScrollPos));
@@ -197,6 +216,9 @@ function HomeContent() {
             recipes={filteredAndSortedRecipes}
             onEdit={handleOpenForm}
             onDelete={handleDeleteRecipe}
+            searchQuery={searchQuery}
+            sortBy={sortBy}
+            filterCategory={filterCategory}
           />
         )}
 

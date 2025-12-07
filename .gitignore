@@ -35,9 +35,22 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env
+.env.local
+.env.electron
+
+# database
+*.db
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
 
 # vercel
 .vercel
+
+# electron
+/dist
+*.dmg
+*.app
 
 # typescript
 *.tsbuildinfo

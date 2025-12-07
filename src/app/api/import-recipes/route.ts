@@ -5,6 +5,7 @@ import * as cheerio from 'cheerio';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { isAdmin } from '@/lib/auth';
+import { deserializeRecipe } from '@/lib/recipe-adapter';
 
 interface ParsedRecipe {
   title: string;
@@ -283,9 +284,9 @@ export async function POST(request: NextRequest) {
           data: {
             title: parsed.title,
             description: parsed.description || null,
-            ingredients: parsed.ingredients,
-            instructions: parsed.instructions,
-            categories: parsed.categories,
+            ingredients: JSON.stringify(parsed.ingredients),
+            instructions: JSON.stringify(parsed.instructions),
+            categories: JSON.stringify(parsed.categories),
             notes: parsed.notes || null,
             rating: parsed.rating > 0 ? parsed.rating : null,
             sourceUrl: parsed.sourceUrl || null,

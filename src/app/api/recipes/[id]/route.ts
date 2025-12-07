@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/auth';
 import { isAdmin } from '@/lib/auth';
+import { deserializeRecipe } from '@/lib/recipe-adapter';
 
 // GET /api/recipes/[id] - Get a single recipe (public)
 export async function GET(
@@ -21,7 +22,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(recipe);
+    return NextResponse.json(deserializeRecipe(recipe));
   } catch (error) {
     console.error('Error fetching recipe:', error);
     return NextResponse.json(
@@ -67,9 +68,9 @@ export async function PUT(
         title,
         description: description || null,
         image: image || null,
-        ingredients: ingredients || [],
-        instructions: instructions || [],
-        categories: categories || [],
+        ingredients: JSON.stringify(ingredients || []),
+        instructions: JSON.stringify(instructions || []),
+        categories: JSON.stringify(categories || []),
         notes: notes || null,
         rating: rating || null,
         sourceUrl: sourceUrl || null,
@@ -89,7 +90,7 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(recipe);
+    return NextResponse.json(deserializeRecipe(recipe));
   } catch (error) {
     console.error('Error updating recipe:', error);
     return NextResponse.json(

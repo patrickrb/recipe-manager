@@ -75,6 +75,8 @@ export default function RecipeView() {
   }, [servingScale, recipe]);
 
   const handleEdit = () => {
+    // Save current scroll position for when returning from edit
+    sessionStorage.setItem('homeScrollPos', '0');
     router.push(`/?edit=${id}`);
   };
 

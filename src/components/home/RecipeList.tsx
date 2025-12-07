@@ -7,9 +7,12 @@ interface RecipeListProps {
     recipes: Recipe[];
     onEdit: (recipe: Recipe) => void;
     onDelete: (id: string) => void;
+    searchQuery: string;
+    sortBy: 'name' | 'recent' | 'rating';
+    filterCategory: string;
 }
 
-export function RecipeList({ recipes, onEdit, onDelete }: RecipeListProps) {
+export function RecipeList({ recipes, onEdit, onDelete, searchQuery, sortBy, filterCategory }: RecipeListProps) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recipes.map((recipe) => (
@@ -18,6 +21,9 @@ export function RecipeList({ recipes, onEdit, onDelete }: RecipeListProps) {
                     recipe={recipe}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    searchQuery={searchQuery}
+                    sortBy={sortBy}
+                    filterCategory={filterCategory}
                 />
             ))}
         </div>

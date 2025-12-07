@@ -2,6 +2,7 @@
   "name": "recipe-manager",
   "version": "0.1.0",
   "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && prisma migrate deploy && npm run seed && next build",
@@ -9,18 +10,25 @@
     "lint": "eslint",
     "import-recipes": "tsx scripts/import-recipes.ts",
     "seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "electron:dev": "prisma generate && prisma db push && concurrently \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "prisma generate && prisma db push && cross-env ELECTRON_BUILD=true next build && electron-builder",
+    "electron:build:mac": "prisma generate && prisma db push && cross-env ELECTRON_BUILD=true next build && electron-builder --mac"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.29.1",
-    "@prisma/adapter-pg": "^7.0.0",
-    "@prisma/client": "^7.0.0",
+    "@prisma/adapter-libsql": "^7.1.0",
+    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/client": "^7.1.0",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.1.2",
     "dotenv": "^17.2.3",
     "next": "16.0.3",
     "next-auth": "^5.0.0-beta.30",
     "pg": "^8.16.3",
+    "prisma": "^7.1.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "zod": "^4.1.13"
@@ -32,11 +40,41 @@
     "@types/pg": "^8.15.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.4",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
-    "prisma": "^7.0.0",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^9.0.3"
+  },
+  "build": {
+    "appId": "com.recipe-manager.app",
+    "productName": "Recipe Manager",
+    "files": [
+      "out/**/*",
+      "electron/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "mac": {
+      "category": "public.app-category.lifestyle",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns"
+    }
   }
 }
