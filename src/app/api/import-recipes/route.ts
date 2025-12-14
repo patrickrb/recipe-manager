@@ -284,9 +284,9 @@ export async function POST(request: NextRequest) {
           data: {
             title: parsed.title,
             description: parsed.description || null,
-            ingredients: JSON.stringify(parsed.ingredients),
-            instructions: JSON.stringify(parsed.instructions),
-            categories: JSON.stringify(parsed.categories),
+            ingredients: parsed.ingredients,
+            instructions: parsed.instructions,
+            categories: parsed.categories,
             notes: parsed.notes || null,
             rating: parsed.rating > 0 ? parsed.rating : null,
             sourceUrl: parsed.sourceUrl || null,

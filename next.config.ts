@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: process.env.ELECTRON_BUILD === 'true' ? 'export' : undefined,
-  distDir: process.env.ELECTRON_BUILD === 'true' ? 'out' : '.next',
+  // Don't use static export for Electron - we need API routes and database
   images: {
-    unoptimized: process.env.ELECTRON_BUILD === 'true',
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",

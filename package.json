@@ -14,8 +14,10 @@
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "electron:dev": "prisma generate && prisma db push && concurrently \"cross-env NODE_ENV=development npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "prisma generate && prisma db push && cross-env ELECTRON_BUILD=true next build && electron-builder",
-    "electron:build:mac": "prisma generate && prisma db push && cross-env ELECTRON_BUILD=true next build && electron-builder --mac"
+    "electron:build": "prisma generate && next build && electron-builder",
+    "electron:build:mac": "prisma generate && next build && electron-builder --mac",
+    "electron:build:win": "prisma generate && next build && electron-builder --win",
+    "electron:build:all": "prisma generate && next build && electron-builder --mac --win"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.29.1",
@@ -54,12 +56,23 @@
   "build": {
     "appId": "com.recipe-manager.app",
     "productName": "Recipe Manager",
+    "nodeGypRebuild": false,
+    "buildDependenciesFromSource": false,
+    "npmRebuild": false,
     "files": [
-      "out/**/*",
+      "!**/node_modules/**/*",
+      ".next/**/*",
+      "public/**/*",
       "electron/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "package.json",
+      "package-lock.json",
+      "next.config.ts",
+      "prisma/schema.prisma"
     ],
+    "extraMetadata": {
+      "main": "electron/main.js"
+    },
+    "afterPack": "./scripts/after-pack.js",
     "directories": {
       "buildResources": "assets"
     },
@@ -75,6 +88,18 @@
         }
       ],
       "icon": "assets/icon.icns"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
     }
   }
 }
